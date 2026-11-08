@@ -1,0 +1,22 @@
+{
+  "seed": 0,
+  "files": {
+    "framing_v2.jsonl": {
+      "sha256": "e496d7018615ff4911690b2a99d441dfa1b88ddeec685da69e694d739ffbd54a",
+      "items": 52
+    },
+    "main.jsonl": {
+      "sha256": "063cec0a322b830950e9999b47e70374aa7ae9dab7d843c5d1691748fdf21d68",
+      "items": 102
+    },
+    "main_run1.jsonl": {
+      "sha256": "966fafa7f5eb37a8c606fac19dd60744b75f7df40947eb772397fcae39e53801",
+      "items": 100
+    },
+    "prompting.jsonl": {
+      "sha256": "736fbf41808a939c94c5dc6baec0f102be53ade8e1067ffaddc90ca5cbe52f33",
+      "items": 216
+    }
+  },
+  "sha256_all": "0163581c521e3c811ff6020b8a62a11b4a5ac28aab7873de252856cbe835faf6"
+}

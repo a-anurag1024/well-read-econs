@@ -2,7 +2,8 @@
 
     python analysis/simple_charts.py
 
-Writes chart_framing.png, chart_sunk_cost.png and chart_act_human.png to analysis/results/.
+Writes chart_framing.png, chart_swing.png, chart_sunk_cost.png, chart_act_human.png, chart_format_check.png,
+chart_position_check.png and chart_paid_free_slopes.png to analysis/results/.
 Human values: Many Labs 1 (Klein et al., 2014); see src/wre/human_reference.py.
 """
 
@@ -284,9 +285,73 @@ def position_check() -> Path:
     return path
 
 
+def _sunk_recs() -> list[dict]:
+    recs = part2.load([str(DATA / "run2_openai.jsonl"), str(DATA / "run2_anthropic.jsonl")])
+    return [r for r in recs if r["task"] == "sunkcost" and r["version"] == "fresh" and "-v11" in r["id"]
+            and not r["err"] and r.get("parsed") is not None]
+
+
+def _sunk_by_scenario(recs, model) -> dict[str, tuple[float, float]]:
+    """{scenario: (average rating with a free ticket, average rating with a paid ticket)}."""
+    out = {}
+    for key in sorted({r["item_key"] for r in recs if r["model"] == model}):
+        free = [r["parsed"] for r in recs if r["model"] == model and r["item_key"] == key and r["condition"] == "lo"]
+        paid = [r["parsed"] for r in recs if r["model"] == model and r["item_key"] == key and r["condition"] == "hi"]
+        if free and paid:
+            out[key] = (sum(free) / len(free), sum(paid) / len(paid))
+    return out
+
+
+def paid_free_slopes() -> Path:
+    """One line per scenario: how the average rating moves when only the ticket sentence changes."""
+    recs = _sunk_recs()
+    models = [
+        ["gpt-6.1-sol", "gpt-6-astra", "claude-sonnet-5.5", "claude-opus-5.5"],
+        ["gpt-4.1", "claude-haiku-4.5", "gpt-4o-mini", "gpt-5-nano"],
+    ]
+    fig, axes = plt.subplots(2, 4, figsize=(10, 6.2), sharey=True)
+    for ax, m in zip(axes.flat, [m for row in models for m in row], strict=True):
+        by = _sunk_by_scenario(recs, m)
+        up = down = 0
+        for free, paid in by.values():
+            color = SAVED if paid > free else LOST if paid < free else MUTED
+            up, down = up + (paid > free), down + (paid < free)
+            ax.plot([0, 1], [free, paid], color=color, alpha=0.55, linewidth=1.6, marker="o", markersize=3.5, zorder=2)
+        mean_free = sum(f for f, _ in by.values()) / len(by)
+        mean_paid = sum(p for _, p in by.values()) / len(by)
+        ax.plot([0, 1], [mean_free, mean_paid], color=INK, linewidth=3, marker="o", markersize=6, zorder=3)
+        _style(ax)
+        ax.grid(axis="x", visible=False)
+        ax.grid(axis="y", color=GRID, linewidth=0.8)
+        ax.set_xlim(-0.35, 1.35)
+        ax.set_xticks([0, 1])
+        ax.set_xticklabels(["free", "paid"], color=INK, fontsize=9)
+        ax.set_ylim(1, 9)
+        ax.set_title(f"{m}\n{mean_paid - mean_free:+.1f} points; {up} up, {down} down of {len(by)}",
+                     fontsize=9, color=INK, loc="left")
+    for ax in axes[:, 0]:
+        ax.set_ylabel("average rating (1-9)", color=INK, fontsize=9)
+    fig.suptitle(
+        "Same story, one sentence changed: does the rating follow?\n"
+        "Each thin line is one of the 12 scenarios (blue: rated higher when paid, orange: higher when free). "
+        "Thick line: average.",
+        x=0.01, ha="left", fontsize=10, color=INK,
+    )
+    fig.text(0.01, 0.01, "Eight of the 16 models are shown. Top row: the two models with no framing effect and the two Claude models.\n"
+             "Bottom row: the largest gap (GPT-4.1) and the three models with no gap or a reversed one.\n"
+             "The other eight have average gaps from -0.1 to +1.5 points; all 16 are in chart_sunk_cost.png.",
+             color=MUTED, fontsize=8)
+    fig.tight_layout(rect=(0, 0.07, 1, 0.92))
+    path = OUT / "chart_paid_free_slopes.png"
+    fig.savefig(path, dpi=160)
+    plt.close(fig)
+    return path
+
+
 def main() -> None:
     OUT.mkdir(parents=True, exist_ok=True)
-    for fn in (framing, swing, sunk_cost, act_human, format_check, position_check):
+    for fn in (framing, swing, sunk_cost, act_human, format_check, position_check,
+               paid_free_slopes):
         print(f"wrote {fn().relative_to(ROOT)}")
 
 

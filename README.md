@@ -10,7 +10,7 @@ I asked 16 AI models (from OpenAI and Anthropic) the same kinds of questions tha
 large replication study (Many Labs 1: 36 labs, over 6,000 people), and compared the percentages.
 An Econ gives the same answer however the question is worded. A Human doesn't.
 
-## What was done
+## What I did
 - Picked two classic tests from the book: **framing** and **sunk cost**.
 - Wrote 12 fresh versions of each (different stories, same structure) and asked every model each question
   several times: about 15,000 answers in total, for about $4.50 in API costs.
@@ -44,7 +44,7 @@ The same data as a single number per model, the **swing** between the two wordin
 - The models' ratings are lower overall than people's. Compare the gap between the two dots, not the position.
 
 ## Finding 3: Telling a model to "act human" doesn't reliably work
-Added one line before the question, such as "act like a typical person" or "go with your gut".
+I added one line before the question, such as "act like a typical person" or "go with your gut".
 
 ![Act human](analysis/results/chart_act_human.png)
 
@@ -55,22 +55,22 @@ Added one line before the question, such as "act like a typical person" or "go w
 - Asking for "perfectly rational" removed the effect in Opus (and Sol and Astra had none to remove).
   Sonnet's rational answers just favored one position, so I don't count them.
 
-## A Check for formatting bias
+## How I checked I wasn't fooling myself
 A model can look like an Econ just because it always picks "A", or the first option listed.
-So here listed the sure option first in exactly half the questions, and asked everything twice with different labels.
+So I listed the sure option first in exactly half the questions, and asked everything twice with different labels.
 
 ![Format check](analysis/results/chart_format_check.png)
 
 ![Position check](analysis/results/chart_position_check.png)
 
 - Sol, Astra, Sonnet and Opus give the same result in both label styles. Four mid-range OpenAI models don't.
-- Claude Haiku 4.5 picked the second-listed option 92% of the time, so left it out of the story.
+- Claude Haiku 4.5 picked the second-listed option 92% of the time, so I left it out of the story.
 
 ## What this does not show
 - Not a ranking of AI companies, and not an explanation of why a model behaves this way.
 - A model that matches people on one question may not match on another. This is two tests, 12 stories each.
 - These are one snapshot of each model from 2026-11-01, at low reasoning effort.
-- People's numbers come from different stories than used here, so the comparison is a guide, not a precise match.
+- People's numbers come from different stories than mine, so the comparison is a guide, not a precise match.
 
 ## Going deeper
 - [docs/explained.md](docs/explained.md): every technical idea in plain English, with worked examples.

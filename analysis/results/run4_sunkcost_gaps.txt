@@ -1,0 +1,35 @@
+PAID MINUS FREE, IN RATING POINTS (1-9 scale), UNDER EACH ONE-LINE INSTRUCTION
+people (Many Labs 1): paid 7.85 vs free 7.24, gap +0.61
+'none' is run 2 (revised items); typical, gut and rational are run 4. 12 fresh scenarios per cell.
+up/down: scenarios where the paid version was rated higher/lower than the free one (both versions scored).
+unscored: answers that could not be turned into a number (for example, an explanation instead of a rating).
+
+model              prompt      paid   free    gap  up/down/of  answers paid/free  unscored
+gpt-6.1-sol        none        3.28   2.72  +0.56    8/0/12          36/36               0
+gpt-6.1-sol        typical     4.12   2.79  +1.33   12/0/12          24/24               0
+gpt-6.1-sol        gut         3.42   2.62  +0.79    8/0/12          24/24               0
+gpt-6.1-sol        rational    3.00   3.00  +0.00    2/3/12          24/24               0
+gpt-6-astra        none        3.25   2.67  +0.58    8/0/12          24/24               0
+gpt-6-astra        typical     4.58   2.83  +1.75   11/0/12          12/12               0
+gpt-6-astra        gut         3.33   2.75  +0.58    7/0/12          12/12               0
+gpt-6-astra        rational    3.00   2.92  +0.08    2/1/12          12/12               0
+claude-sonnet-5.5  none        5.25   3.77  +1.48   11/0/12          48/48               0
+claude-sonnet-5.5  typical     5.00   3.67  +1.33   11/0/12          12/12               0
+claude-sonnet-5.5  gut         5.42   3.58  +1.83   11/0/12          12/12               0
+claude-sonnet-5.5  rational    4.00   3.58  +0.42    2/2/6            6/12               6
+claude-opus-5.5    none        4.64   3.47  +1.17   10/0/12          36/36               0
+claude-opus-5.5    typical     6.08   3.17  +2.92   12/0/12          12/12               0
+claude-opus-5.5    gut         5.50   3.50  +2.00   10/0/12          12/12               0
+claude-opus-5.5    rational    3.67   3.50  +0.17    2/1/12          12/12               0
+gpt-4o             none        5.10   3.78  +1.32   12/0/12          60/60               0
+gpt-4o             typical     5.08   3.75  +1.33   11/0/12          12/12               0
+gpt-4o             gut         5.33   3.83  +1.50    9/1/12          12/12               0
+gpt-4o             rational    1.67   2.67  -1.00    1/5/12          12/12               0
+gpt-4.1            none        6.22   3.78  +2.43   12/0/12          60/60               0
+gpt-4.1            typical     5.25   4.08  +1.17   10/0/12          12/12               0
+gpt-4.1            gut         6.50   4.17  +2.33   10/0/12          12/12               0
+gpt-4.1            rational    2.67   3.00  -0.33    0/1/12          12/12               0
+gpt-5-mini         none        4.24   3.60  +0.64   10/2/12          72/72               0
+gpt-5-mini         typical     5.08   4.67  +0.42    4/1/12          12/12               0
+gpt-5-mini         gut         4.67   4.33  +0.33    3/2/12          12/12               0
+gpt-5-mini         rational    5.75   5.33  +0.42    4/3/12          12/12               0

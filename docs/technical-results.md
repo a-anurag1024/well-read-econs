@@ -57,6 +57,10 @@ wording and 0% under the loss wording, so the interval has no width. Sonnet's `r
 because it picked the first-listed option 98% of the time. These cells have one answer per question
 (two for Sol), so cells near a band edge are not precise.
 
+The sunk cost cells in plain units (average rating with a paid ticket minus with a free ticket, in points of the
+1 to 9 scale, with the number of scenarios that go up or down) are in
+[run4_sunkcost_gaps.txt](../analysis/results/run4_sunkcost_gaps.txt). The no-instruction column there comes from run 2.
+
 ## What to be careful about
 See [limitations.md](limitations.md). In short: effect sizes describe these items and this prompt style at
 low reasoning effort; per-model intervals are wide; the human numbers come from different stories; and

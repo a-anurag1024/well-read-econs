@@ -12,7 +12,7 @@ import contextlib
 import io
 from pathlib import Path
 
-from wre import diagnostics, gate2, part2, position_swing, robust, sunk_gaps
+from wre import diagnostics, gate2, part2, position_swing, price_check, robust, sunk_gaps
 from wre.report import gate1 as run1_checks
 from wre.report import render, summarize
 
@@ -97,6 +97,12 @@ def run3_by_position() -> str:
     return position_swing.render(position_swing.analyze(recs))
 
 
+def run2_price_check() -> str:
+    price = price_check.prices()
+    recs = part2.load([str(DATA / "run2_openai.jsonl"), str(DATA / "run2_anthropic.jsonl")])
+    return price_check.render(price_check.analyze(recs, price), price)
+
+
 def main() -> None:
     OUT.mkdir(parents=True, exist_ok=True)
     for name, fn in (
@@ -106,6 +112,7 @@ def main() -> None:
         ("run3_swing_by_position", run3_by_position),
         ("run4_prompting", run4),
         ("run4_sunkcost_gaps", run4_sunk_gaps),
+        ("run2_sunkcost_price_check", run2_price_check),
     ):
         buf = io.StringIO()
         with contextlib.redirect_stdout(buf):

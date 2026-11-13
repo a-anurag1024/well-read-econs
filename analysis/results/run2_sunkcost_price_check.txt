@@ -1,0 +1,28 @@
+DOES THE PAID-MINUS-FREE GAP GROW WITH THE TICKET PRICE?
+12 scenarios, paid ticket priced from $45 to $150. Gap = average rating with the paid ticket
+minus average with the free ticket (1-9 scale, run 2, revised items), computed per scenario.
+r = Pearson and rho = Spearman correlation of the scenario gap with the scenario price.
+cheap/dear = average gap over the six cheapest / six most expensive scenarios.
+With 12 scenarios, |r| must exceed about 0.58 to be told apart from zero. nan = no variation in the gap.
+
+model                scenarios       r     rho   cheap    dear
+gpt-4o                      12   -0.20   -0.28   +1.63   +1.00
+gpt-4o-mini                 12   +0.10   +0.28   -0.33   -0.42
+gpt-4.1-mini                12   -0.28   -0.12   +0.17   -0.28
+gpt-4.1                     12   +0.33   +0.33   +2.30   +2.57
+gpt-5-nano                  12   -0.24   -0.38   -0.56   -2.11
+gpt-5-mini                  12   -0.10   -0.05   +0.69   +0.58
+gpt-5.1                     12   +0.48   +0.46   +0.40   +1.37
+gpt-5.2                     12   +0.04   +0.09   +1.37   +1.63
+gpt-5.4-mini                12   +0.01   -0.02   +0.67   +0.69
+gpt-5.6-luna                12   -0.23   -0.29   +1.11   +0.31
+gpt-6-luna                  12   +0.17   +0.22   +0.81   +0.97
+gpt-6.1-sol                 12   +0.07   +0.02   +0.56   +0.56
+gpt-6-astra                 12   +0.22   +0.19   +0.58   +0.58
+claude-haiku-4.5            12   +0.03   +0.07   +0.22   +0.06
+claude-sonnet-5.5           12   -0.02   -0.04   +1.67   +1.29
+claude-opus-5.5             12   +0.26   +0.23   +1.00   +1.33
+
+models with a correlation: 16 of 16; positive 10, negative 6
+range of r: -0.28 to +0.48
+models with |r| above 0.58: 0

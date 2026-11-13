@@ -62,6 +62,14 @@ The sunk cost cells in plain units (average rating with a paid ticket minus with
 1 to 9 scale, with the number of scenarios that go up or down) are in
 [run4_sunkcost_gaps.txt](../analysis/results/run4_sunkcost_gaps.txt). The no-instruction column there comes from run 2.
 
+## Sunk cost: does the gap grow with the price?
+The paid version of each sunk cost scenario names a price ($45 to $150). If the gap were a response to money
+spent, it should be larger where the price is higher. For each of the 16 models, [run2_sunkcost_price_check.txt](../analysis/results/run2_sunkcost_price_check.txt)
+correlates the per-scenario gap with the scenario price. The correlations run from -0.28 to +0.48, ten are positive and
+six negative, and none passes the roughly 0.58 needed to tell a correlation over 12 scenarios from zero. So there is no
+consistent sign and no clear relationship, which fits reading the gap as paid-versus-free sensitivity and not as an effect of the amount spent. With 12 scenarios per model this
+can only rule out a strong relationship, not a weak one.
+
 ## What to be careful about
 See [limitations.md](limitations.md). In short: effect sizes describe these items and this prompt style at
 low reasoning effort; per-model intervals are wide; the human numbers come from different stories; and

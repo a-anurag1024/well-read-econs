@@ -6,6 +6,7 @@
 - Not a ranking of vendors or models, and not evidence about why a model behaves as it does. A vendor may be more Econ-like because of choices not visible here.
 - Not evidence that a model "has" preferences or biases. A model that matches the human effect on one task need not match it on another, and matching an average effect size says nothing about matching the distribution of human answers.
 - Exaggeration (an effect larger than the human one) is not "more human".
+- A pooled framing swing averages two layouts (sure option listed first and second) and for most models they differ a lot; a model's swing, and whether it is above or below the human 31 points, can depend on the layout. The human value comes from one layout. Sonnet 5.5's answers under the loss wording follow the position (92% sure when the sure option is first, 8% when it is second). Only Haiku is flagged as position-biased, because the rule is 95% on one position. See `analysis/results/run3_swing_by_position.txt`.
 - A zero effect means no detectable effect at this sample size, not proof of rationality. Two models (`gpt-6.1-sol`, `gpt-6-astra`) choose the certain option every time, so their intervals are degenerate.
 
 **Design limits**

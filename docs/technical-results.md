@@ -35,6 +35,7 @@ Verdict by the pre-registered rules: **headline firm**.
 - Model ordering is stable between earlier runs and run 3 (rank correlation 0.91).
 - Four OpenAI models are format-sensitive (`gpt-5.1`, `gpt-5.2`, `gpt-5.6-luna`, `gpt-6-luna`); Haiku is
   position-biased.
+- The swing depends on where the sure option is listed. Split by layout, most models show a much smaller swing when the sure option is listed first than when it is listed second (Sonnet 5.5: 8 vs 89 points; Opus 5.5: 14 vs 39); Sol and Astra are 0 in both. Under the loss wording Sonnet picks whichever option is listed first. The pooled swings above average the two layouts, which is the intended design. See [run3_swing_by_position.txt](../analysis/results/run3_swing_by_position.txt) and [chart_swing_by_position.png](../analysis/results/chart_swing_by_position.png).
 
 **Reading d carefully.** Opus's d (2.19) is larger than Sonnet's (2.13) even though its swing between
 wordings is smaller (26 vs 49 percentage points), because d works on odds and Opus sits near 100% in

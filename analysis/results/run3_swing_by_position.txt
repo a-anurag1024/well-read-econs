@@ -1,0 +1,22 @@
+FRAMING SWING BY POSITION OF THE SURE PLAN (run 3, fresh scenarios, percentage points)
+people (Many Labs 1): 65.5% vs 34.5%, swing 31
+sure first / sure second: the sure plan was listed first / second; saved/lost = % choosing the sure plan.
+pooled = both layouts together (the swing in chart_swing.png). first-listed = % choosing the first-listed option.
+
+model              pooled  sure first  saved/lost  sure second  saved/lost  first-listed  n per cell
+gpt-4o                 28           8    94/86              47    92/44              61%  36/36/36/36
+gpt-4o-mini            39          31    44/14              47    56/8               49%  36/36/36/36
+gpt-4.1-mini           38           0    33/33              75    81/6               45%  36/36/36/36
+gpt-4.1                21           6   100/94              36   100/64              58%  36/36/36/36
+gpt-5-nano             -4          -6    69/75              -3    42/44              65%  36/36/36/36
+gpt-5-mini             26           6    58/53              47    56/8               62%  36/36/36/36
+gpt-5.1                56          39    61/22              72   100/28              39%  36/36/36/36
+gpt-5.2                17         -14    42/56              47    97/50              38%  36/36/36/36
+gpt-5.4-mini           24         -11    67/78              58    86/28              58%  36/36/36/36
+gpt-5.6-luna           17          14    61/47              19    22/3               71%  36/36/36/36
+gpt-6-luna             35          33    97/64              36    72/36              63%  36/36/36/36
+gpt-6.1-sol             0           0   100/100              0   100/100             50%  36/36/36/36
+gpt-6-astra             0           0   100/100              0   100/100             52%  22/22/21/20
+claude-haiku-4.5        7          14    22/8                0   100/100              8%  36/36/36/36
+claude-sonnet-5.5      49           8   100/92              89    97/8               72%  36/36/36/36
+claude-opus-5.5        26          14   100/86              39   100/61              56%  36/36/36/36

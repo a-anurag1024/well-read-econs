@@ -3,7 +3,7 @@
     python analysis/simple_charts.py
 
 Writes chart_framing.png, chart_swing.png, chart_sunk_cost.png, chart_act_human.png, chart_format_check.png,
-chart_position_check.png and chart_paid_free_slopes.png to analysis/results/.
+chart_position_check.png, chart_paid_free_slopes.png and chart_swing_by_position.png to analysis/results/.
 Human values: Many Labs 1 (Klein et al., 2014); see src/wre/human_reference.py.
 """
 
@@ -16,7 +16,7 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-from wre import part2, robust
+from wre import part2, position_swing, robust
 
 ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "data"
@@ -348,10 +348,54 @@ def paid_free_slopes() -> Path:
     return path
 
 
+POS_FIRST, POS_SECOND = "#0e7490", "#be185d"  # sure plan listed first / second
+
+
+def swing_by_position() -> Path:
+    """The framing swing when the sure plan was listed first and when it was listed second."""
+    out = position_swing.analyze(_framing_recs())
+    rows = sorted(out.items(), key=lambda kv: kv[1]["pooled"]["swing"])
+    fig, ax = plt.subplots(figsize=(8, 6.2))
+    _style(ax)
+    ax.grid(axis="y", visible=False)
+    human = HUMAN_SURE["saved"] - HUMAN_SURE["lost"]
+    ax.axvline(human, color=MUTED, linewidth=1, linestyle=(0, (4, 3)), zorder=1)
+    ax.text(human + 1, len(rows) - 0.4, "people: 31 points", color=MUTED, fontsize=9, va="bottom")
+    for y, (m, c) in enumerate(rows):
+        alpha = 0.4 if m in UNRELIABLE else 1.0
+        _pair(ax, y, c["sure_first"]["swing"], c["sure_second"]["swing"], POS_FIRST, POS_SECOND, alpha=alpha)
+        ax.plot(c["pooled"]["swing"], y, marker="|", markersize=15, markeredgewidth=2, color=INK,
+                alpha=alpha, zorder=4, linestyle="")
+    ax.set_yticks(range(len(rows)))
+    ax.set_yticklabels([m + (" *" if m in UNRELIABLE else "") for m, _ in rows], color=INK, fontsize=9)
+    ax.set_xlim(-22, 100)
+    ax.set_ylim(-0.7, len(rows))
+    ax.set_xlabel("swing between the two wordings (percentage points)", color=INK, fontsize=10)
+    handles = [
+        plt.Line2D([], [], marker="o", color=POS_FIRST, linestyle="", markersize=8, label="sure plan listed first"),
+        plt.Line2D([], [], marker="o", color=POS_SECOND, linestyle="", markersize=8, label="sure plan listed second"),
+        plt.Line2D([], [], marker="|", color=INK, linestyle="", markersize=12, markeredgewidth=2,
+                   label="both layouts together"),
+    ]
+    ax.legend(handles=handles, loc="lower right", frameon=False, fontsize=9, labelcolor=INK)
+    fig.suptitle(
+        "Does the swing depend on where the sure plan is listed?\n"
+        "Swing = % choosing the sure option when worded 'saved' minus when worded 'lost'. An Econ: 0.",
+        x=0.01, ha="left", fontsize=10, color=INK,
+    )
+    fig.text(0.01, 0.01, "* unreliable on this test (faded). About 36 answers per wording in each layout "
+             "(fewer for gpt-6-astra).", color=MUTED, fontsize=8)
+    fig.tight_layout(rect=(0, 0.03, 1, 0.93))
+    path = OUT / "chart_swing_by_position.png"
+    fig.savefig(path, dpi=160)
+    plt.close(fig)
+    return path
+
+
 def main() -> None:
     OUT.mkdir(parents=True, exist_ok=True)
     for fn in (framing, swing, sunk_cost, act_human, format_check, position_check,
-               paid_free_slopes):
+               paid_free_slopes, swing_by_position):
         print(f"wrote {fn().relative_to(ROOT)}")
 
 

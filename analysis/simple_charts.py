@@ -31,6 +31,31 @@ HUMAN_SUNK = {"paid": 7.85, "free": 7.24}  # mean 1-9 rating of going to the eve
 # Models whose framing result is unreliable on this test (see docs/limitations.md and run 3 results).
 UNRELIABLE = {"claude-haiku-4.5", "gpt-5.1", "gpt-5.2", "gpt-5.6-luna", "gpt-6-luna"}
 
+# Display names used on the charts (the data files keep the API aliases).
+NAMES = {
+    "gpt-6.1-sol": "GPT-6.1 Sol",
+    "gpt-6-astra": "GPT-6 Astra",
+    "gpt-6-luna": "GPT-6 Luna",
+    "gpt-5.6-luna": "GPT-5.6 Luna",
+    "gpt-5.4-mini": "GPT-5.4 mini",
+    "gpt-5.2": "GPT-5.2",
+    "gpt-5.1": "GPT-5.1",
+    "gpt-5-mini": "GPT-5 mini",
+    "gpt-5-nano": "GPT-5 nano",
+    "gpt-4.1": "GPT-4.1",
+    "gpt-4.1-mini": "GPT-4.1 mini",
+    "gpt-4o": "GPT-4o",
+    "gpt-4o-mini": "GPT-4o mini",
+    "claude-opus-5.5": "Claude Opus 5.5",
+    "claude-sonnet-5.5": "Claude Sonnet 5.5",
+    "claude-haiku-4.5": "Claude Haiku 4.5",
+}
+PEOPLE = "People (Many Labs)"
+
+
+def _name(model: str, faded: bool = False) -> str:
+    return NAMES.get(model, model) + (" *" if faded and model in UNRELIABLE else "")
+
 
 def _style(ax) -> None:
     for side in ("top", "right"):
@@ -42,10 +67,16 @@ def _style(ax) -> None:
     ax.set_axisbelow(True)
 
 
-def _pair(ax, y, a, b, color_a=SAVED, color_b=LOST, size=8, alpha=1.0):
-    """Two dots joined by a thin line (the gap is the message)."""
+def _pair(ax, y, a, b, color_a=SAVED, color_b=LOST, size=8, alpha=1.0, tol=1.5):
+    """Two dots joined by a thin line (the gap is the message).
+
+    When the two values are within `tol`, the first dot is drawn as a larger ring behind the second,
+    so that both stay visible instead of one hiding the other.
+    """
     ax.plot([a, b], [y, y], color=MUTED, linewidth=1.4, alpha=0.5 * alpha, zorder=1, solid_capstyle="round")
-    ax.plot(a, y, "o", markersize=size, color=color_a, markeredgecolor="white", markeredgewidth=1, zorder=3, alpha=alpha)
+    first = size + 4 if abs(a - b) <= tol else size
+    ax.plot(a, y, "o", markersize=first, color=color_a, markeredgecolor="white", markeredgewidth=1,
+            zorder=2 if first > size else 3, alpha=alpha)
     ax.plot(b, y, "o", markersize=size, color=color_b, markeredgecolor="white", markeredgewidth=1, zorder=3, alpha=alpha)
 
 
@@ -71,17 +102,17 @@ def framing() -> Path:
     n = len(rows)
     ax.axhspan(n - 0.5, n + 0.6, color=BAND, zorder=0)
     _pair(ax, n, HUMAN_SURE["saved"], HUMAN_SURE["lost"], size=9)
-    ax.text(2, n, "People (study)", color=INK, fontsize=9.5, fontweight="bold", va="center")
+    ax.text(2, n, PEOPLE, color=INK, fontsize=9.5, fontweight="bold", va="center")
     for y, (m, saved, lost) in enumerate(rows):
         _pair(ax, y, saved, lost, alpha=0.45 if m in UNRELIABLE else 1.0)
     ax.set_yticks(range(n))
-    ax.set_yticklabels([m + (" *" if m in UNRELIABLE else "") for m, *_ in rows], color=INK, fontsize=9)
+    ax.set_yticklabels([_name(m, faded=True) for m, *_ in rows], color=INK, fontsize=9.5)
     ax.set_xlim(-2, 104)
     ax.set_ylim(-0.7, n + 0.7)
     ax.set_xlabel("% of answers choosing the sure option", color=INK, fontsize=10)
     fig.suptitle(
         "Same choice, two wordings: described as lives saved vs lives lost\n"
-        "A pure Econ gives the same answer both ways (the two dots sit on top of each other).",
+        "A pure Econ gives the same answer both ways (an orange dot inside a blue ring).",
         x=0.01,
         ha="left",
         fontsize=10,
@@ -111,18 +142,18 @@ def sunk_cost() -> Path:
     _style(ax)
     n = len(rows)
     ax.axhspan(n - 0.5, n + 0.6, color=BAND, zorder=0)
-    _pair(ax, n, HUMAN_SUNK["paid"], HUMAN_SUNK["free"], size=9)
-    ax.text(1.05, n, "People (study)", color=INK, fontsize=9.5, fontweight="bold", va="center")
+    _pair(ax, n, HUMAN_SUNK["paid"], HUMAN_SUNK["free"], size=9, tol=0.12)
+    ax.text(1.05, n, PEOPLE, color=INK, fontsize=9.5, fontweight="bold", va="center")
     for y, (_, paid, free) in enumerate(rows):
-        _pair(ax, y, paid, free)
+        _pair(ax, y, paid, free, tol=0.12)
     ax.set_yticks(range(n))
-    ax.set_yticklabels([m for m, *_ in rows], color=INK, fontsize=9)
+    ax.set_yticklabels([_name(m) for m, *_ in rows], color=INK, fontsize=9.5)
     ax.set_xlim(1, 9)
     ax.set_ylim(-0.7, n + 0.7)
     ax.set_xlabel("average rating of going to the event (1 = stay home, 9 = definitely go)", color=INK, fontsize=10)
     fig.suptitle(
         "Would you go in bad weather? Ticket you paid for vs a free ticket\n"
-        "A pure Econ ignores what was paid (the two dots sit on top of each other).",
+        "A pure Econ ignores what was paid (an orange dot inside a blue ring).",
         x=0.01,
         ha="left",
         fontsize=10,
@@ -149,30 +180,38 @@ def act_human() -> Path:
         ("gut", "'go with your gut'"),
         ("rational", "'act perfectly rational'"),
     ]
-    fig, axes = plt.subplots(1, 4, figsize=(10, 3.9), sharey=True, sharex=True)
-    for ax, m in zip(axes, part2.ANCHORS, strict=True):
+    fig, axes = plt.subplots(2, 2, figsize=(8.2, 6.3), sharey=True, sharex=True)
+    for ax, m in zip(axes.flat, part2.ANCHORS, strict=True):
         _style(ax)
+        ax.tick_params(labelsize=9.5)
         ax.axhspan(len(rows) - 0.5, len(rows) + 0.5, color=BAND, zorder=0)
         _pair(ax, len(rows), HUMAN_SURE["saved"], HUMAN_SURE["lost"], size=8)
         for y, (key, _) in enumerate(reversed(rows)):
             c = out["cells"][m][key]
             _pair(ax, y, 100 * c["gain"], 100 * c["loss"], size=8, alpha=1.0 if c["valid"] else 0.4)
-        ax.set_title(m, fontsize=10, color=INK, loc="left")
+        ax.set_title(_name(m), fontsize=11, color=INK, loc="left", fontweight="bold")
         ax.set_xlim(-4, 104)
         ax.set_ylim(-0.6, len(rows) + 0.6)
         ax.set_xticks([0, 50, 100])
-    axes[0].set_yticks(range(len(rows) + 1))
-    axes[0].set_yticklabels([lab for _, lab in reversed(rows)] + ["People (study)"], fontsize=8.5, color=INK)
-    fig.supxlabel("% of answers choosing the sure option", color=INK, fontsize=10)
+    axes[0, 0].set_yticks(range(len(rows) + 1))
+    for ax in axes[:, 0]:
+        ax.set_yticklabels([lab for _, lab in reversed(rows)] + [PEOPLE], fontsize=9.5, color=INK)
+    fig.supxlabel("% of answers choosing the sure option", color=INK, fontsize=10.5, y=0.065)
     fig.suptitle(
-        "Does telling the model to act human (or rational) change the gap? (blue: worded as 'saved', orange: 'lost')\n"
-        "Humans: dots about 30 points apart. An Econ: dots on top of each other. Faded: unreliable (always favored one position).",
+        "Does telling the model to act human (or rational) change the framing swing?\n"
+        "People: dots about 30 points apart. An Econ: an orange dot inside a blue ring.\n"
+        "Faded dots: unreliable (the model always favored one position).",
         x=0.01,
         ha="left",
-        fontsize=10,
+        fontsize=10.5,
         color=INK,
     )
-    fig.tight_layout(rect=(0, 0.04, 1, 0.92))
+    handles = [
+        plt.Line2D([], [], marker="o", color=SAVED, linestyle="", markersize=8, label="worded as 'saved'"),
+        plt.Line2D([], [], marker="o", color=LOST, linestyle="", markersize=8, label="worded as 'lost'"),
+    ]
+    fig.legend(handles=handles, loc="lower center", ncol=2, frameon=False, fontsize=10, labelcolor=INK)
+    fig.tight_layout(rect=(0, 0.1, 1, 0.9))
     path = OUT / "chart_act_human.png"
     fig.savefig(path, dpi=160)
     plt.close(fig)
@@ -204,9 +243,10 @@ def swing() -> Path:
     ax.text(human + 1, len(rows) - 0.4, "people: 31 points", color=MUTED, fontsize=9, va="bottom")
     for y, (m, g) in enumerate(rows):
         ax.barh(y, g, height=0.5, color=SAVED, alpha=0.4 if m in UNRELIABLE else 1.0, zorder=2)
-        ax.text(max(g, 0) + 1, y, f"{g:.0f}", va="center", color=INK, fontsize=8.5)
+        ax.text(max(g, 0) + 1.2, y, f"{g:.0f}", va="center", color=INK, fontsize=9, zorder=5,
+                bbox={"facecolor": "white", "edgecolor": "none", "pad": 1.2})
     ax.set_yticks(range(len(rows)))
-    ax.set_yticklabels([m + (" *" if m in UNRELIABLE else "") for m, _ in rows], color=INK, fontsize=9)
+    ax.set_yticklabels([_name(m, faded=True) for m, _ in rows], color=INK, fontsize=9.5)
     ax.set_xlim(-8, 100)
     ax.set_ylim(-0.7, len(rows))
     ax.set_xlabel("swing between the two wordings (percentage points)", color=INK, fontsize=10)
@@ -235,7 +275,7 @@ def format_check() -> Path:
     for y, (m, a, b) in enumerate(rows):
         _pair(ax, y, a, b, color_a=FMT_AB, color_b=FMT_N, alpha=0.4 if m in UNRELIABLE else 1.0)
     ax.set_yticks(range(n))
-    ax.set_yticklabels([m + (" *" if m in UNRELIABLE else "") for m, *_ in rows], color=INK, fontsize=9)
+    ax.set_yticklabels([_name(m, faded=True) for m, *_ in rows], color=INK, fontsize=9.5)
     ax.set_xlim(min(-10, min(min(a, b) for _, a, b in rows) - 4), 100)
     ax.set_ylim(-0.7, n - 0.3)
     ax.set_xlabel("swing between the two wordings (percentage points)", color=INK, fontsize=10)
@@ -269,7 +309,7 @@ def position_check() -> Path:
         ax.plot([50, s], [y, y], color=MUTED, linewidth=1.2, alpha=0.5, zorder=2)
         ax.plot(s, y, "o", markersize=8, color=SAVED if s > 20 else LOST, markeredgecolor="white", zorder=3)
     ax.set_yticks(range(len(rows)))
-    ax.set_yticklabels([m for m, _ in rows], color=INK, fontsize=9)
+    ax.set_yticklabels([_name(m) for m, _ in rows], color=INK, fontsize=9.5)
     ax.text(rows[0][1] + 2, 0.35, "picks the second-listed option 92% of the time", color=MUTED, fontsize=8.5)
     ax.set_xlim(0, 100)
     ax.set_xlabel("% of answers choosing whichever option was listed first", color=INK, fontsize=10)
@@ -309,7 +349,7 @@ def paid_free_slopes() -> Path:
         ["gpt-6.1-sol", "gpt-6-astra", "claude-sonnet-5.5", "claude-opus-5.5"],
         ["gpt-4.1", "claude-haiku-4.5", "gpt-4o-mini", "gpt-5-nano"],
     ]
-    fig, axes = plt.subplots(2, 4, figsize=(10, 6.2), sharey=True)
+    fig, axes = plt.subplots(2, 4, figsize=(10, 7.2), sharey=True)
     for ax, m in zip(axes.flat, [m for row in models for m in row], strict=True):
         by = _sunk_by_scenario(recs, m)
         up = down = 0
@@ -325,23 +365,31 @@ def paid_free_slopes() -> Path:
         ax.grid(axis="y", color=GRID, linewidth=0.8)
         ax.set_xlim(-0.35, 1.35)
         ax.set_xticks([0, 1])
-        ax.set_xticklabels(["free", "paid"], color=INK, fontsize=9)
+        ax.set_xticklabels(["free", "paid"], color=INK, fontsize=10.5)
+        ax.tick_params(axis="y", labelsize=10)
         ax.set_ylim(1, 9)
-        ax.set_title(f"{m}\n{mean_paid - mean_free:+.1f} points; {up} up, {down} down of {len(by)}",
-                     fontsize=9, color=INK, loc="left")
+        ax.set_title(f"{_name(m)}\n{mean_paid - mean_free:+.1f} points\n{up} up, {down} down of {len(by)}",
+                     fontsize=10.5, color=INK, loc="left", linespacing=1.35)
     for ax in axes[:, 0]:
-        ax.set_ylabel("average rating (1-9)", color=INK, fontsize=9)
+        ax.set_ylabel("average rating (1-9)", color=INK, fontsize=10.5)
     fig.suptitle(
         "Same story, one sentence changed: does the rating follow?\n"
-        "Each thin line is one of the 12 scenarios (blue: rated higher when paid, orange: higher when free). "
-        "Thick line: average.",
-        x=0.01, ha="left", fontsize=10, color=INK,
+        "Each thin line is one of the 12 scenarios; the thick line is the average.",
+        x=0.01, ha="left", fontsize=11.5, color=INK,
     )
+    handles = [
+        plt.Line2D([], [], color=SAVED, linewidth=2.2, label="rated higher when paid"),
+        plt.Line2D([], [], color=LOST, linewidth=2.2, label="rated higher when free"),
+        plt.Line2D([], [], color=MUTED, linewidth=2.2, label="no change"),
+        plt.Line2D([], [], color=INK, linewidth=3.5, label="average"),
+    ]
+    fig.legend(handles=handles, loc="upper left", ncol=4, frameon=False, fontsize=10, labelcolor=INK,
+               bbox_to_anchor=(0.005, 0.915), columnspacing=1.6, handlelength=1.8)
     fig.text(0.01, 0.01, "Eight of the 16 models are shown. Top row: the two models with no framing effect and the two Claude models.\n"
              "Bottom row: the largest gap (GPT-4.1) and the three models with no gap or a reversed one.\n"
              "The other eight have average gaps from -0.1 to +1.5 points; all 16 are in chart_sunk_cost.png.",
-             color=MUTED, fontsize=8)
-    fig.tight_layout(rect=(0, 0.07, 1, 0.92))
+             color=MUTED, fontsize=9)
+    fig.tight_layout(rect=(0, 0.075, 1, 0.9))
     path = OUT / "chart_paid_free_slopes.png"
     fig.savefig(path, dpi=160)
     plt.close(fig)
@@ -367,7 +415,7 @@ def swing_by_position() -> Path:
         ax.plot(c["pooled"]["swing"], y, marker="|", markersize=15, markeredgewidth=2, color=INK,
                 alpha=alpha, zorder=4, linestyle="")
     ax.set_yticks(range(len(rows)))
-    ax.set_yticklabels([m + (" *" if m in UNRELIABLE else "") for m, _ in rows], color=INK, fontsize=9)
+    ax.set_yticklabels([_name(m, faded=True) for m, _ in rows], color=INK, fontsize=9.5)
     ax.set_xlim(-22, 100)
     ax.set_ylim(-0.7, len(rows))
     ax.set_xlabel("swing between the two wordings (percentage points)", color=INK, fontsize=10)
@@ -384,7 +432,7 @@ def swing_by_position() -> Path:
         x=0.01, ha="left", fontsize=10, color=INK,
     )
     fig.text(0.01, 0.01, "* unreliable on this test (faded). About 36 answers per wording in each layout "
-             "(fewer for gpt-6-astra).", color=MUTED, fontsize=8)
+             "(fewer for GPT-6 Astra).", color=MUTED, fontsize=8)
     fig.tight_layout(rect=(0, 0.03, 1, 0.93))
     path = OUT / "chart_swing_by_position.png"
     fig.savefig(path, dpi=160)

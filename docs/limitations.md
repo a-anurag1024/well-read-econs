@@ -22,4 +22,5 @@
 **Process limits**
 - The preregistration is not in an external registry. The plans are dated records written before each run; this repository cannot prove when they were written.
 - Some checks were added after results were seen (response-style diagnostics, disclosed in `preregistration/run2-plan.md`); none changed a pre-registered verdict. The anchoring analysis keeps items with identical answers in both conditions at zero effect; this was changed after the first look at the run 1 data (it had dropped them, which inflated the effect) and the stop/continue verdict was unchanged.
+- The scenario-level intervals, the layout and label estimates and the canonical-versus-fresh comparison were added after all four runs and are not covered by the pre-registered plans. They are descriptive.
 - In runs 3 and 4 a spending cap is checked between calls, so calls in flight finished after it was reached; run 3 overshot its $0.90 cap by $0.025.

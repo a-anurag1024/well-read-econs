@@ -70,6 +70,55 @@ six negative, and none passes the roughly 0.58 needed to tell a correlation over
 consistent sign and no clear relationship, which fits reading the gap as paid-versus-free sensitivity and not as an effect of the amount spent. With 12 scenarios per model this
 can only rule out a strong relationship, not a weak one.
 
+## Scenario-level intervals in percentage points and rating points
+The effect sizes above are in Cohen's d. [item_level_intervals.txt](../analysis/results/item_level_intervals.txt)
+reports the same effects in the units used for the human reference values (framing swing in percentage points,
+sunk cost gap in rating points), with the scenario as the unit of replication: each model's effect is the mean
+of its 12 scenario differences, with a 95% t interval on the spread of those differences and a scenario
+bootstrap next to it. In this balanced design that mean is the fixed effect of a linear mixed model with a random
+intercept and a random wording slope for scenario; [item_level_mixed_check.txt](../analysis/results/item_level_mixed_check.txt)
+(optional, needs `pip install -e ".[stats]"`) fits that model and gets the same estimates, with standard errors
+that agree closely.
+
+- **Framing.** Claude Sonnet 5.5 swings 49 points (95% interval 39 to 58, positive in all 12 scenarios);
+  Claude Opus 5.5 swings 26 (4 to 49); GPT-4.1 21 (4 to 38). GPT-6.1 Sol and GPT-6 Astra have no spread across
+  scenarios (0 in every one), so their intervals are single points and say nothing about uncertainty.
+- **Layout and label.** The sure plan is listed first under one label style and second under the other within a
+  scenario, so layout and label style are crossed by scenario and can be estimated separately. The layout effect
+  (swing with the sure plan second minus first) is 81 points for Claude Sonnet 5.5 (51 to 110), 25 for Claude Opus 5.5
+  (1 to 49) and 0 for Sol and Astra. The label effect for GPT-5.1 is -50 (-87 to -13) and for GPT-6 Luna -36
+  (-68 to -4). Intervals on these two effects assume that the layout and label effects add up and, being
+  linear-scale intervals on shares, can run past 100.
+- **Sunk cost.** GPT-6.1 Sol 0.56 (0.25 to 0.86) and GPT-6 Astra 0.58 (0.29 to 0.88) both contain the human
+  0.61 and exclude zero; GPT-4.1 2.43 (1.91 to 2.96), Claude Sonnet 5.5 1.48 (0.98 to 1.97) and GPT-4o 1.32
+  (0.73 to 1.91) are above it; Claude Opus 5.5 1.17 (0.61 to 1.73) reaches it at the lower end.
+- **One-line instructions.** The same intervals for the four anchor models under each instruction are in the
+  last section of the file. Run 4 has one answer per prompt (two for GPT-6.1 Sol), so those intervals mix scenario
+  spread with answer noise.
+
+These are descriptive intervals for 16 models and two tests, with no correction for multiple comparisons.
+
+## Canonical wording against fresh scenarios
+Each test has one canonical item (a paraphrase of the textbook version). [canonical_vs_fresh.txt](../analysis/results/canonical_vs_fresh.txt)
+sets each model's canonical effect beside its fresh-scenario effect (framing from run 3, sunk cost from run 2).
+The canonical item is a single scenario answered about six times per condition by each model, so a single model's
+canonical number is noisy and has no interval; the informative quantity is the mean difference across models.
+
+- **Framing.** Across the 15 models with canonical answers, the canonical swing is on average 11.6 points larger
+  than the fresh swing, with a 95% bootstrap interval over models of -2.9 to +28.6 (larger in 9 models, smaller in 5,
+  equal in 1). For the 10 models not marked unreliable it is +15.4 (-5.3 to +39.3). GPT-4o and GPT-4.1 swing 100
+  points on the canonical wording (6 of 6 sure answers when worded as saved, 0 of 6 when worded as lost) and 28 and 21 on
+  fresh scenarios; Claude Sonnet 5.5 swings 83 and 49. GPT-6.1 Sol is 0 on both. GPT-6 Astra has no canonical
+  answers in run 3.
+- **Sunk cost.** The mean canonical-minus-fresh gap is -0.12 rating points (-0.49 to +0.24; canonical larger in 6
+  models, smaller in 10).
+
+Across the 16 models, the fresh framing swing and the fresh sunk cost gap are only weakly related (Spearman
+rank correlation 0.27 over all 16, 0.25 over the 11 whose framing result is not marked unreliable).
+
+So on average the evidence for a stronger effect on the famous wording is weak, with a few large single-model
+differences. One canonical scenario cannot separate recognition of the wording from a feature of that scenario.
+
 ## What to be careful about
 See [limitations.md](limitations.md). In short: effect sizes describe these items and this prompt style at
 low reasoning effort; per-model intervals are wide; the human numbers come from different stories; and

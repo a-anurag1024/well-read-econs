@@ -1,0 +1,42 @@
+MIXED-MODEL CROSS-CHECK (statsmodels 0.15.0; MixedLM, REML, random scenario intercept and slope)
+by-scenario = mean of the 12 scenario differences with se = sd / sqrt(12) (wre.item_level).
+mixed = fixed effect of the wording from the mixed model. mixed+layout adds layout and label style as fixed terms
+that interact with the wording (centred, so the wording effect is the average over both layouts and label styles).
+
+FRAMING SWING (percentage points)
+model                       by-scenario                  mixed           mixed+layout
+gpt-4o                   +27.8 (se 7.2)         +27.8 (se 7.8)         +27.8 (se 7.9)
+gpt-4o-mini              +38.9 (se 8.8)         +38.9 (se 8.8)         +38.9 (se 8.8)
+gpt-4.1-mini            +37.5 (se 10.3)        +37.5 (se 10.3)        +37.5 (se 10.3)
+gpt-4.1                  +20.8 (se 7.7)         +20.8 (se 9.6)        +20.8 (se 12.5)
+gpt-5-nano                -4.2 (se 9.0)          -4.2 (se 9.0)          -4.2 (se 9.0)
+gpt-5-mini               +26.4 (se 7.2)         +26.4 (se 8.0)         +26.4 (se 7.8)
+gpt-5.1                  +55.6 (se 9.9)         +55.6 (se 9.9)         +55.6 (se 9.9)
+gpt-5.2                  +16.7 (se 8.7)         +16.7 (se 8.7)         +16.7 (se 8.7)
+gpt-5.4-mini             +23.6 (se 7.5)         +23.6 (se 8.0)         +23.6 (se 7.5)
+gpt-5.6-luna            +16.7 (se 11.2)        +16.7 (se 11.3)        +16.7 (se 11.2)
+gpt-6-luna               +34.7 (se 9.0)         +34.7 (se 9.0)         +34.7 (se 9.0)
+gpt-6.1-sol               +0.0 (se 0.0)                 no fit                 no fit
+gpt-6-astra               +0.0 (se 0.0)                 no fit                 no fit
+claude-haiku-4.5          +6.9 (se 5.6)          +6.9 (se 8.5)          +6.9 (se 5.8)
+claude-sonnet-5.5        +48.6 (se 4.3)         +48.6 (se 6.4)         +48.6 (se 4.6)
+claude-opus-5.5         +26.4 (se 10.1)        +26.4 (se 12.5)        +26.4 (se 10.7)
+
+SUNK COST GAP (rating points)
+model                       by-scenario                  mixed
+gpt-4o                  +1.32 (se 0.27)        +1.32 (se 0.27)
+gpt-4o-mini             -0.38 (se 0.16)        -0.37 (se 0.16)
+gpt-4.1-mini            -0.06 (se 0.27)        -0.06 (se 0.27)
+gpt-4.1                 +2.43 (se 0.24)        +2.43 (se 0.24)
+gpt-5-nano              -1.33 (se 0.40)        -1.33 (se 0.43)
+gpt-5-mini              +0.64 (se 0.25)        +0.64 (se 0.25)
+gpt-5.1                 +0.88 (se 0.33)        +0.88 (se 0.33)
+gpt-5.2                 +1.50 (se 0.28)        +1.50 (se 0.28)
+gpt-5.4-mini            +0.68 (se 0.17)        +0.68 (se 0.17)
+gpt-5.6-luna            +0.71 (se 0.33)        +0.71 (se 0.33)
+gpt-6-luna              +0.89 (se 0.33)        +0.89 (se 0.33)
+gpt-6.1-sol             +0.56 (se 0.14)        +0.56 (se 0.14)
+gpt-6-astra             +0.58 (se 0.14)        +0.58 (se 0.14)
+claude-haiku-4.5        +0.14 (se 0.15)        +0.14 (se 0.15)
+claude-sonnet-5.5       +1.48 (se 0.22)        +1.48 (se 0.22)
+claude-opus-5.5         +1.17 (se 0.25)        +1.17 (se 0.25)

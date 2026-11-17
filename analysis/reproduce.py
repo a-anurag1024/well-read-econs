@@ -12,7 +12,17 @@ import contextlib
 import io
 from pathlib import Path
 
-from wre import diagnostics, gate2, part2, position_swing, price_check, robust, sunk_gaps
+from wre import (
+    canonical,
+    diagnostics,
+    gate2,
+    item_level,
+    part2,
+    position_swing,
+    price_check,
+    robust,
+    sunk_gaps,
+)
 from wre.report import gate1 as run1_checks
 from wre.report import render, summarize
 
@@ -42,7 +52,9 @@ def run2() -> str:
         "  acquiescence = P(yes|allow) + P(yes|forbid) - 1; humans (Many Labs): 0.763 + 0.072 - 1 = -0.17",
         f"  {'model':20s} {'P(yes|allow)':>13s} {'P(yes|forbid)':>14s} {'acquiescence':>13s} {'unparsed':>9s}",
     ]
-    recs = gate2.load(str(DATA / "run2_openai.jsonl")) + gate2.load(str(DATA / "run2_anthropic.jsonl"))
+    recs = gate2.load(str(DATA / "run2_openai.jsonl")) + gate2.load(
+        str(DATA / "run2_anthropic.jsonl")
+    )
     for m in dict.fromkeys(r["model"] for r in recs):
         y = diagnostics.yes_bias(recs, m)
         lines.append(
@@ -53,7 +65,9 @@ def run2() -> str:
 
 
 def run3() -> str:
-    recs = part2.load([str(DATA / "run3_framing_openai.jsonl"), str(DATA / "run3_framing_anthropic.jsonl")])
+    recs = part2.load(
+        [str(DATA / "run3_framing_openai.jsonl"), str(DATA / "run3_framing_anthropic.jsonl")]
+    )
     earlier = part2.load([str(DATA / "run1_openai.jsonl"), str(DATA / "run2_anthropic.jsonl")])
     out = robust.analyze(recs, earlier)
     lines = [robust.render(out), ""]
@@ -75,7 +89,9 @@ def run3() -> str:
 def run4() -> str:
     out = part2.analyze(
         part2.load([str(DATA / "run4_prompting.jsonl")]),
-        part2.load([str(DATA / "run3_framing_openai.jsonl"), str(DATA / "run3_framing_anthropic.jsonl")]),
+        part2.load(
+            [str(DATA / "run3_framing_openai.jsonl"), str(DATA / "run3_framing_anthropic.jsonl")]
+        ),
         part2.load([str(DATA / "run2_openai.jsonl"), str(DATA / "run2_anthropic.jsonl")]),
     )
     return part2.render(out)
@@ -103,6 +119,32 @@ def run2_price_check() -> str:
     return price_check.render(price_check.analyze(recs, price), price)
 
 
+def item_level_intervals() -> str:
+    run3 = part2.load(
+        [str(DATA / "run3_framing_openai.jsonl"), str(DATA / "run3_framing_anthropic.jsonl")]
+    )
+    run2 = part2.load([str(DATA / "run2_openai.jsonl"), str(DATA / "run2_anthropic.jsonl")])
+    run4 = part2.load([str(DATA / "run4_prompting.jsonl")])
+    return "\n\n".join(
+        (
+            item_level.render_framing(item_level.framing(run3)),
+            item_level.render_sunk(item_level.sunk_cost(run2)),
+            item_level.render_prompting(item_level.prompting(run4, run3, run2)),
+        )
+    )
+
+
+def canonical_vs_fresh() -> str:
+    run3 = part2.load(
+        [str(DATA / "run3_framing_openai.jsonl"), str(DATA / "run3_framing_anthropic.jsonl")]
+    )
+    earlier = part2.load([str(DATA / "run1_openai.jsonl"), str(DATA / "run2_anthropic.jsonl")])
+    flags = robust.analyze(run3, earlier)
+    unreliable = [*flags["R3_format_sensitive"], *flags["R4_biased"]]
+    run2 = part2.load([str(DATA / "run2_openai.jsonl"), str(DATA / "run2_anthropic.jsonl")])
+    return canonical.render(canonical.framing_rows(run3), canonical.sunk_rows(run2), unreliable)
+
+
 def main() -> None:
     OUT.mkdir(parents=True, exist_ok=True)
     for name, fn in (
@@ -113,6 +155,8 @@ def main() -> None:
         ("run4_prompting", run4),
         ("run4_sunkcost_gaps", run4_sunk_gaps),
         ("run2_sunkcost_price_check", run2_price_check),
+        ("item_level_intervals", item_level_intervals),
+        ("canonical_vs_fresh", canonical_vs_fresh),
     ):
         buf = io.StringIO()
         with contextlib.redirect_stdout(buf):
